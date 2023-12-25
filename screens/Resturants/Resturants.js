@@ -1,10 +1,12 @@
 import react, { useEffect, useState } from "react";
-import { View, FlatList, Text, Pressable } from "react-native";
+import { View, FlatList, Text, Pressable, Modal } from "react-native";
 import axios from "axios";
 import styles from "./styles";
 
-const Resturants = () => {
+const Resturants = ({ navigation }) => {
     const [resturants, setResturants] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedRestaurant, setSelectedRestaurant] = useState({});
 
     const getResturants = async () => {
         try {
@@ -23,6 +25,7 @@ const Resturants = () => {
         getResturants()
             .then((response) => {
                 console.log(response.data);
+                console.log(response.data[0].dishes.length)
                 setResturants(response.data);
             })
             .catch(error => console.log(error));
@@ -30,32 +33,65 @@ const Resturants = () => {
 
     const renderRestaurant = ({ item }) => {
         return (
-            <View style={ styles.resturantCard }>
-                <Text style={ styles.resturantName }>
-                    { item.name }
-                </Text>
-                <Text>
-                    { item.ratings }
-                </Text>
-                <Pressable style={ styles.btn }>
-                    <Text style={ styles.btnText }>
-                        Show On Map
+            <Pressable
+                onLongPress={() => {
+                    setSelectedRestaurant(item);
+                    setModalVisible(true);
+                }}
+                onPress={() => {
+                    navigation.navigate('Dishes', { restaurant: item });
+                }}
+            >
+                <View style={ styles.resturantCard }>
+                    <Text style={ styles.resturantName }>
+                        { item && item.name }
                     </Text>
-                </Pressable>
-            </View>
+                    <Text>
+                        { item && item.ratings }
+                    </Text>
+                    <Pressable style={ styles.btn }>
+                        <Text style={ styles.btnText }>
+                            Show On Map
+                        </Text>
+                    </Pressable>
+                </View>
+            </Pressable>
         )
     }
 
     return (
-        <View>
-            <Text style={ styles.title }>
-                Restaurants
-            </Text>
-            <FlatList
-                data={resturants}
-                renderItem={renderRestaurant}
-                keyExtractor={item => item.id}
-            />
+        <View style={{ paddingHorizontal: '5%', paddingBottom: 20,}}>
+            <View>
+                <Text style={ styles.title }>
+                    Restaurants
+                </Text>
+                <FlatList
+                    data={resturants}
+                    renderItem={renderRestaurant}
+                    keyExtractor={item => item.id}
+                />
+            </View>
+            
+            {/* Restaurant Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(false);
+                }}
+            >
+                <Pressable
+                    style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+                    onPress={() => setModalVisible(false)}
+                > 
+                    <View style={{ gap:5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: 'purple', borderRadius: 10, }}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', color: '#fff'}}>{ selectedRestaurant.name }</Text>
+                        <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', color: '#fff' }}>Ratings: {selectedRestaurant.ratings}</Text>
+                        <Text style={{ color: '#fff' }}>Number of Dishes: { selectedRestaurant.dishes && selectedRestaurant.dishes.length }</Text>
+                    </View>
+                </Pressable>
+            </Modal>
         </View>
     )
 }
