@@ -25,7 +25,6 @@ const Resturants = ({ navigation }) => {
         getResturants()
             .then((response) => {
                 console.log(response.data);
-                console.log(response.data[0].dishes.length)
                 setResturants(response.data);
             })
             .catch(error => console.log(error));
@@ -49,7 +48,12 @@ const Resturants = ({ navigation }) => {
                     <Text>
                         { item && item.ratings }
                     </Text>
-                    <Pressable style={ styles.btn }>
+                    <Pressable
+                        style={styles.btn}
+                        onPress={() => {
+                            navigation.navigate("ShowOnMap", { restaurantName: item.name, lat: item.latLng.latitude , long: item.latLng.longitude})
+                        }}
+                    >
                         <Text style={ styles.btnText }>
                             Show On Map
                         </Text>
@@ -62,9 +66,6 @@ const Resturants = ({ navigation }) => {
     return (
         <View style={{ paddingHorizontal: '5%', paddingBottom: 20,}}>
             <View>
-                <Text style={ styles.title }>
-                    Restaurants
-                </Text>
                 <FlatList
                     data={resturants}
                     renderItem={renderRestaurant}

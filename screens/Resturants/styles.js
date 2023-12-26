@@ -6,11 +6,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginHorizontal: 'auto',
         marginVertical: 5,
-        borderRadius: 10,
         backgroundColor: 'skyblue',
         paddingTop: 8,
         paddingBottom: 10,
         paddingHorizontal: 15,
+        textAlign: 'center',
     },  
 
     resturantCard: {
